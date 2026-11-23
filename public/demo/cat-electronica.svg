@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262626"/><stop offset="1" stop-color="#0a0a0a"/></linearGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <ellipse cx="400" cy="770" rx="260" ry="34" fill="url(#sh)"/>
+  
+    <path d="M230 560 V470 a170 170 0 0 1 340 0 V560" fill="none" stroke="#f5f5f5" stroke-width="34" stroke-linecap="round"/>
+    <rect x="190" y="520" width="110" height="190" rx="48" fill="#f5f5f5"/>
+    <rect x="500" y="520" width="110" height="190" rx="48" fill="#f5f5f5"/>
+    <rect x="215" y="550" width="40" height="130" rx="20" fill="#737373" opacity=".5"/>
+  <text x="400" y="90" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="22" letter-spacing="8" fill="#a3a3a3">IMAGEN DE DEMOSTRACIÓN</text>
+</svg>

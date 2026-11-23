@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7e5e4"/><stop offset="1" stop-color="#d6d3d1"/></linearGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <ellipse cx="400" cy="770" rx="260" ry="34" fill="url(#sh)"/>
+  
+    <path d="M310 240 L200 300 L150 640 L240 650 L275 440 L275 760 H525 V440 L560 650 L650 640 L600 300 L490 240 L400 330 Z" fill="#1c1917"/>
+    <path d="M400 330 V760" stroke="#78716c" stroke-width="8"/>
+    <path d="M310 240 L360 420 L400 330 L440 420 L490 240" fill="#78716c" opacity=".6"/>
+  <text x="400" y="900" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="22" letter-spacing="8" fill="#57534e">NOVASTORE · DEMO</text>
+</svg>

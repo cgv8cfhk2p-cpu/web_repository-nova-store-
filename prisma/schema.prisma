@@ -1,0 +1,200 @@
+// NOVASTORE — modelo de datos
+// Importes siempre en céntimos (Int) para evitar errores de redondeo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum OrderStatus {
+  PENDING // pendiente: pedido creado, esperando confirmación de Stripe
+  PAID // pagado: Stripe ha confirmado el cobro (webhook)
+  PREPARING // preparando
+  SHIPPED // enviado
+  DELIVERED // entregado
+  CANCELLED // cancelado / pago no completado
+  REFUNDED // reembolsado
+}
+
+enum Carrier {
+  NONE
+  CORREOS
+  GLS
+  DHL
+  OTHER
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  sortOrder   Int       @default(0)
+  active      Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  brand            String?
+  description      String
+  priceCents       Int
+  compareAtCents   Int? // precio anterior (para mostrar ofertas)
+  stock            Int            @default(0)
+  sku              String?        @unique
+  active           Boolean        @default(true)
+  featured         Boolean        @default(false)
+  isDemo           Boolean        @default(false) // contenido de demostración: no es un producto real
+  weightGrams      Int? // útil para la futura integración con transportistas
+  categoryId       String
+  category         Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images           ProductImage[]
+  orderItems       OrderItem[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([categoryId, active])
+  @@index([active, createdAt])
+  @@index([active, featured])
+  @@index([priceCents])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  position  Int      @default(0)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([productId, position])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  fullName  String
+  phone     String?
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  number                Int         @unique @default(autoincrement()) // nº de pedido visible
+  status                OrderStatus @default(PENDING)
+  customerId            String
+  customer              Customer    @relation(fields: [customerId], references: [id])
+  email                 String
+
+  // Dirección de envío (copia inmutable asociada al pedido)
+  shippingName          String
+  shippingPhone         String
+  shippingCountry       String // ISO 3166-1 alfa-2 (ES, PT, FR...)
+  shippingProvince      String
+  shippingCity          String
+  shippingPostalCode    String
+  shippingAddress1      String
+  shippingAddress2      String?
+
+  subtotalCents         Int
+  shippingCents         Int
+  totalCents            Int
+  currency              String      @default("eur")
+  shippingRateName      String?
+
+  // Stripe (nunca se guardan datos de tarjeta: solo identificadores)
+  stripeSessionId       String?     @unique
+  stripePaymentIntentId String?     @unique
+  stripeRiskLevel       String? // normal | elevated | highest (Stripe Radar)
+  paidAt                DateTime?
+  stockReleased         Boolean     @default(false)
+
+  // Envío
+  carrier               Carrier     @default(NONE)
+  trackingNumber        String?
+  trackingUrl           String?
+  labelUrl              String? // etiqueta generada (futura integración)
+  shippedAt             DateTime?
+  deliveredAt           DateTime?
+
+  adminNotes            String?
+  clientIp              String?
+  items                 OrderItem[]
+  events                OrderEvent[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      String?
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  // Copia de los datos en el momento de la compra
+  name           String
+  sku            String?
+  imageUrl       String?
+  unitPriceCents Int
+  quantity       Int
+
+  @@index([productId])
+}
+
+// Historial de cambios del pedido (auditoría)
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+model ShippingRate {
+  id                String   @id @default(cuid())
+  name              String // p. ej. "España peninsular — Estándar 24/72h"
+  countries         String // códigos ISO separados por comas: "ES,PT"
+  priceCents        Int
+  freeOverCents     Int? // envío gratis a partir de este subtotal
+  estimatedDaysMin  Int      @default(2)
+  estimatedDaysMax  Int      @default(5)
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Eventos de Stripe ya procesados (idempotencia de webhooks)
+model StripeEvent {
+  id          String   @id // id del evento de Stripe (evt_...)
+  type        String
+  processedAt DateTime @default(now())
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+}

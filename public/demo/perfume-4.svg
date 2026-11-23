@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f5f9"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>
+  <radialGradient id="sh"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient></defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <ellipse cx="400" cy="770" rx="260" ry="34" fill="url(#sh)"/>
+  
+    <circle cx="400" cy="560" r="190" fill="#f8fafc" stroke="#0f172a" stroke-width="6"/>
+    <circle cx="340" cy="500" r="50" fill="#fff" opacity=".35"/>
+    <rect x="360" y="290" width="80" height="90" rx="6" fill="#0f172a"/>
+    <rect x="380" y="370" width="40" height="10" fill="#64748b"/>
+    <text x="400" y="575" text-anchor="middle" font-family="Helvetica,Arial" font-size="30" letter-spacing="8" fill="#0f172a">N°7</text>
+  <text x="400" y="900" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="22" letter-spacing="8" fill="#475569">NOVASTORE · DEMO</text>
+</svg>
